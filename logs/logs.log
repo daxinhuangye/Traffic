@@ -1,0 +1,15 @@
+2018/01/10 11:07:49 [D] [beegoDb.go:27] 数据库服务器链接成功 
+2018/01/10 11:07:49 [I] [asm_amd64.s:2232] http server Running on http://:80
+2018/01/10 11:08:06 [D] [log.go:106] 管理员初始化 
+2018/01/10 11:09:43 [D] [log.go:106] 管理员初始化 
+2018/01/10 11:09:44 [E] [login.go:48] <QuerySeter> no row found 
+2018/01/10 11:09:49 [D] [log.go:106] 管理员初始化 
+2018/01/10 11:09:50 [E] [login.go:48] <QuerySeter> no row found 
+2018/01/10 11:11:48 [D] [log.go:106] 管理员初始化 
+2018/01/10 11:11:49 [E] [login.go:48] <QuerySeter> no row found 
+2018/01/10 11:12:35 [D] [log.go:106] 管理员初始化 
+2018/01/10 11:12:35 [E] [login.go:48] <QuerySeter> no row found 
+2018/01/10 11:20:27 [D] [log.go:106] 管理员初始化 
+2018/01/10 11:20:34 [D] [log.go:106] 管理员初始化 
+2018/01/10 11:20:35 [E] [login.go:48] <QuerySeter> no row found 
+2018/01/10 11:21:09 [D] [log.go:106] 管理员初始化 

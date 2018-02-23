@@ -1,5 +1,5 @@
 
-app.controller("FilesEditCtrl", ["$sce", "$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", function ($sce, $scope, $http, $filter, $modalInstance, curr_data, appCfg) {
+app.controller("FilesEditCtrl", ["$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", function ($scope, $http, $filter, $modalInstance, curr_data, appCfg) {
 	
 	
     $scope.cancel = function () {
@@ -42,32 +42,48 @@ app.controller("FilesEditCtrl", ["$sce", "$scope", "$http", "$filter", "$modalIn
 		});
 
     };
+
+	$scope._simpleConfig = {
+            //这里可以选择自己需要的工具按钮名称,此处仅选择如下五个
+            toolbars:[[ 'source', '|', 'undo', 'redo', '|',
+            'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'removeformat', '|', 'forecolor', 'backcolor','|', 'insertorderedlist', 'insertunorderedlist', '|',
+            'customstyle', 'paragraph', 'fontfamily', 'fontsize', 'lineheight', 
+            'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|', 'touppercase', 'tolowercase', '|',
+            'link', 'unlink', 'anchor', '|', 'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',
+            'simpleupload', 'insertimage', 'emotion', 'scrawl', 'pagebreak', 'template', 'background', '|',
+            'horizontal', 'date', 'time', 'spechars', 'snapscreen', 'wordimage', '|',
+            'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',
+            'selectall', 'cleardoc', 'preview']],
+            initialFrameWidth:'100%',
+            initialFrameHeight:320,
+            //focus时自动清空初始化时的内容
+            autoClearinitialContent:true,
+            //关闭字数统计
+            wordCount:false,
+            //关闭elementPath
+            elementPathEnabled:false
+      };
+
+
 	/***********************数据定义*****************************/
 	$scope.attrDef = [
-		{"Key":"Domain", "Title":"域名", "InputType":"text", "Required":"true"},
+		{"Key":"Domain", "Title":"标题", "InputType":"text", "Required":"true"},
 		{"Key":"Sort", "Title":"排序", "InputType":"text-i", "Required":"true", "Min":1, "Max":100},
-		{"Key":"Note", "Title":"备注", "InputType":"text", "Required":"false"},
+		{"Key":"Content", "Title":"内容", "InputType":"ueditor", "Required":"false", "Config":$scope._simpleConfig},
+		{"Key":"Status", "Title":"状态", "InputType":"radio", "Required":"true",  "Value":[[1,"草稿"],[2,"发布"]]},
+
 	];	
 	
 	/***********************初始化*****************************/
-	$scope.title = "文件上传";
+	$scope.title = "添加软文";
 	$scope.op =  angular.copy(curr_data.Op);
 	$scope.oldData = angular.copy(curr_data.Data);
 	$scope.editData = angular.copy($scope.oldData);
     $scope.postUrl = appCfg.AppPrefix +"/files/add";
 
 	if (curr_data.Op=='edit'){
-		$scope.title= "编辑文件";
+		$scope.title= "编辑软文";
 		$scope.postUrl = appCfg.AppPrefix +"/files/edit";
-	}
-	if (curr_data.Op=='play'){
-		$scope.title= $scope.oldData.FileName +"--播放测试";
-
-		var url = encodeURI("http://jdyun.com/?vid=" + $scope.oldData.Key);
-		
-		$scope.playUrl = $sce.trustAsResourceUrl("http://123.172.7.3:8200/jx/?url="+url);
-
-
 	}
 
 

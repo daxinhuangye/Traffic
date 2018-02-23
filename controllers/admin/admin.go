@@ -5,14 +5,15 @@ import (
 	"Traffic/controllers"
 	"Traffic/models"
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/validation"
 	"tsEngine/tsCrypto"
 	"tsEngine/tsDb"
 	"tsEngine/tsFile"
 	"tsEngine/tsRand"
 	"tsEngine/tsString"
 	"tsEngine/tsTime"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/validation"
 )
 
 type AdminController struct {
@@ -109,9 +110,7 @@ func (this *AdminController) Add() {
 	o.Mobile = this.GetString("Mobile")
 	o.Address = this.GetString("Address")
 	o.Note = this.GetString("Note")
-	o.EndTime = tsTime.CurrSe() + 86400*30
-	o.Share, _ = this.GetInt64("Share")
-	o.Token = tsCrypto.GetMd5([]byte(o.Username))
+
 	//****************************************************
 	//数据验证
 
@@ -132,7 +131,7 @@ func (this *AdminController) Add() {
 		this.TraceJson()
 	}
 	valid.Range(int(o.Status), 1, 2, "Status").Message("状态类型错误[1,2]")
-	valid.Range(int(o.Share), 1, 2, "Share").Message("分享类型错误[1,2]")
+
 	if o.Name != "" {
 		valid.MaxSize(o.Name, 10, "Name").Message("真实姓名过长")
 	}
@@ -295,7 +294,6 @@ func (this *AdminController) Edit() {
 	o.Mobile = this.GetString("Mobile")
 	o.Address = this.GetString("Address")
 	o.Note = this.GetString("Note")
-	o.Share, _ = this.GetInt64("Share")
 
 	//****************************************************
 	//数据验证
@@ -322,7 +320,7 @@ func (this *AdminController) Edit() {
 		o.Password = old_password
 	}
 	valid.Range(int(o.Status), 1, 2, "Status").Message("状态类型错误[1,2]")
-	valid.Range(int(o.Share), 1, 2, "Share").Message("分享类型错误[1,2]")
+
 	if o.Name != "" {
 		valid.MaxSize(o.Name, 10, "Name").Message("真实姓名过长")
 	}

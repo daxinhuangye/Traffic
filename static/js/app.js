@@ -2,13 +2,8 @@
 app.config( ["$routeProvider", function ($routeProvider) {
 	
 	$routeProvider.when('/start', {
-		templateUrl: '/static/page/app/files_list.html',
+		templateUrl: '/static/page/app/domain_list.html',
 		controller: "FilesListCtrl"
-	});
-
-	$routeProvider.when('/my/list', {
-		templateUrl: '/static/page/app/my_list.html',
-		controller: "MyListCtrl"
 	});
 
 	$routeProvider.when('/files/list', {
@@ -21,10 +16,6 @@ app.config( ["$routeProvider", function ($routeProvider) {
 		controller: "DomainListCtrl"
 	});
 
-	$routeProvider.when('/qq/list', {
-		templateUrl: '/static/page/app/qq_list.html',
-		controller: "QqListCtrl"
-	});
 }]);
 
 ;
@@ -177,7 +168,7 @@ app.controller("DomainListCtrl", ["$scope", "$http", "$filter", "$modal", "EzCon
 }]);
 ;
 
-app.controller("FilesEditCtrl", ["$sce", "$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", function ($sce, $scope, $http, $filter, $modalInstance, curr_data, appCfg) {
+app.controller("FilesEditCtrl", ["$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", function ($scope, $http, $filter, $modalInstance, curr_data, appCfg) {
 	
 	
     $scope.cancel = function () {
@@ -220,408 +211,56 @@ app.controller("FilesEditCtrl", ["$sce", "$scope", "$http", "$filter", "$modalIn
 		});
 
     };
+
+	$scope._simpleConfig = {
+            //这里可以选择自己需要的工具按钮名称,此处仅选择如下五个
+            toolbars:[[ 'source', '|', 'undo', 'redo', '|',
+            'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'removeformat', '|', 'forecolor', 'backcolor','|', 'insertorderedlist', 'insertunorderedlist', '|',
+            
+            'customstyle', 'paragraph', 'fontfamily', 'fontsize', 'lineheight', 
+            'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|', 'touppercase', 'tolowercase', '|',
+            'link', 'unlink', 'anchor', '|', 'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',
+            'simpleupload', 'insertimage', 'emotion', 'scrawl', 'pagebreak', 'template', 'background', '|',
+            'horizontal', 'date', 'time', 'spechars', 'snapscreen', 'wordimage', '|',
+            'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',
+            'selectall', 'cleardoc', 'preview']],
+            initialFrameWidth:'100%',
+            initialFrameHeight:320,
+            //focus时自动清空初始化时的内容
+            autoClearinitialContent:true,
+            //关闭字数统计
+            wordCount:false,
+            //关闭elementPath
+            elementPathEnabled:false
+      };
+
+
 	/***********************数据定义*****************************/
 	$scope.attrDef = [
-		{"Key":"Domain", "Title":"域名", "InputType":"text", "Required":"true"},
+		{"Key":"Domain", "Title":"标题", "InputType":"text", "Required":"true"},
 		{"Key":"Sort", "Title":"排序", "InputType":"text-i", "Required":"true", "Min":1, "Max":100},
-		{"Key":"Note", "Title":"备注", "InputType":"text", "Required":"false"},
+		{"Key":"Content", "Title":"内容", "InputType":"ueditor", "Required":"false", "Config":$scope._simpleConfig},
+		{"Key":"Status", "Title":"状态", "InputType":"radio", "Required":"true",  "Value":[[1,"草稿"],[2,"发布"]]},
+
 	];	
 	
 	/***********************初始化*****************************/
-	$scope.title = "文件上传";
+	$scope.title = "添加软文";
 	$scope.op =  angular.copy(curr_data.Op);
 	$scope.oldData = angular.copy(curr_data.Data);
 	$scope.editData = angular.copy($scope.oldData);
     $scope.postUrl = appCfg.AppPrefix +"/files/add";
 
 	if (curr_data.Op=='edit'){
-		$scope.title= "编辑文件";
+		$scope.title= "编辑软文";
 		$scope.postUrl = appCfg.AppPrefix +"/files/edit";
 	}
-	if (curr_data.Op=='play'){
-		$scope.title= $scope.oldData.FileName +"--播放测试";
-
-		var url = encodeURI("http://jdyun.com/?vid=" + $scope.oldData.Key);
-		
-		$scope.playUrl = $sce.trustAsResourceUrl("http://123.172.7.3:8200/jx/?url="+url);
-
-
-	}
 
 
 
 }])
 ;
-app.controller("FilesListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "configService",  "categoryService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, configService, categoryService) {
-
-	$scope.config = configService.data;
-	$scope.category = categoryService.data;
-
-	//**************************************************************
-	$scope.search = {
-						
-						PageSize:15,//单页条数
-						Page:1,//默认当前页为第一页
-						Keyword:"",
-					};
-
-
-	$scope.getList = function() {
-		var url = appCfg.AppPrefix + "/files/list";
-		$http.post(url, $scope.search).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				$scope.listData= data.Data;
-			}
-		});	
-	};
-
-
-	var modalInstance;
-	
-	$scope.edit = function(id) {
-		
-		var url = appCfg.AppPrefix + "/files/edit/" + id;
-		$http.get(url).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				 modalInstance = $modal.open({
-					backdrop: false,
-		            templateUrl: "/static/page/modal/base.html",
-		            controller: "FilesEditCtrl",
-		            resolve: {
-		            	curr_data: function () {
-		                    return {"Op":"edit", "Data":data.Data};
-		                }
-		            }
-		        }), modalInstance.result.then(function (data) {
-		        	$scope.getList();
-		        });
-			}
-		});
-       
-	};
-	
-	$scope.play = function(key) {
-
-		var url = appCfg.AppPrefix + "/files/play/" + key;
-		$http.get(url).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				 modalInstance = $modal.open({
-					backdrop: false,
-		            templateUrl:"/static/page/modal/files_play.html?"+version,
-		            controller: "FilesEditCtrl",
-		            resolve: {
-		            	curr_data: function () {
-		                    return {"Op":"play", "Data":data.Data};
-		                }
-		            }
-		      
-		        });
-			}
-		});
-
-	};
-
-	$scope.download = function(key) {
-		
-		var url = appCfg.AppPrefix + "/files/download/" + key;
-		$http.get(url).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				window.location.href = data.Data.DownloadUrl;
-			}
-        })  
-	};
-
-
-	$scope.activation = function(key) {
-
-		var url = appCfg.AppPrefix + "/my/activation/" + key;
-		$http.get(url).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				alert("激活成功");
-			}
-        })  
-       
-	};
-
-	$scope.del = function(item) {
-		EzConfirm.create({heading: '文件删除', text: '确定删除“'+item.Name+'“吗？'}).then(function() {
-        	var post = angular.copy(item);  
-			var url = appCfg.AppPrefix + "/files/del";
-			$http.post(url, post).success(function(data, status, headers, config) {
-				if($filter("CheckError")(data)){
-					$scope.getList();
-				}
-			});		  	
-		});
-	};
-	
-
-	$scope.getList();
-}]);
-;
-
-app.controller("MyEditCtrl", ["$sce", "$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg",  "categoryService", function ($sce, $scope, $http, $filter, $modalInstance, curr_data, appCfg, categoryService) {
-	
-	
-    $scope.cancel = function () {
-    	$modalInstance.dismiss("cancel");
-    };   
-	
-    $scope.reset = function() {
-    	$scope.editData = angular.copy($scope.oldData);
-    };
-    
-    $scope.change = function(attr) {
-    	if (attr.length==0) {
-    		for (var attr in $scope.editData) {
-    			if (!$scope.oldData.hasOwnProperty(attr)) {
-    				return true;
-    			}
-    			if ($scope.oldData[attr] != $scope.editData[attr]) {
-            		return true;
-            	}
-    		}
-        	return false;    		
-    	} else {
-			if (!$scope.oldData.hasOwnProperty(attr)) {
-				return true;
-			}
-    		if ($scope.oldData[attr] != $scope.editData[attr]) {
-        		return true;
-        	}
-        	return false;
-    	}
-    	return false;
-    };
-    
-    $scope.save = function() {
-
-		$http.post($scope.postUrl, $scope.editData).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				$modalInstance.close(data);
-			}
-		});
-
-    };
-	/***********************数据定义*****************************/
-	$scope.attrDef = [
-		{"Key":"Name", "Title":"文件名", "InputType":"text", "Required":"true"},
-		{"Key":"Category", "Title":"分类", "InputType":"select", "Required":"true", "Value":categoryService.data.Items},
-
-	];	
-	
-	/***********************初始化*****************************/
-	$scope.title = "文件上传";
-	$scope.op =  angular.copy(curr_data.Op);
-	$scope.oldData = angular.copy(curr_data.Data);
-	$scope.editData = angular.copy($scope.oldData);
-   
-	if (curr_data.Op=='edit'){
-		$scope.title= "编辑文件";
-		$scope.postUrl = appCfg.AppPrefix +"/my/edit";
-	}
-
-	if (curr_data.Op=='play'){
-		$scope.title= $scope.oldData.FileName +"--播放测试";
-
-		var url = encodeURI("http://jdyun.com/?vid=" + $scope.oldData.Key);
-		
-		$scope.playUrl = $sce.trustAsResourceUrl("http://123.172.7.3:8200/jx/?url="+url);
-
-	}
-
-
-
-}])
-;
-app.controller("MyListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "configService",  "categoryService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, configService, categoryService) {
-
-	$scope.config = configService.data;
-	$scope.category = categoryService.data;
-
-	//**************************************************************
-	$scope.search = {
-						PageSize:15,//单页条数
-						Page:1,//默认当前页为第一页
-						Keyword:"",
-					};
-
-
-	$scope.getList = function() {
-		var url = appCfg.AppPrefix + "/my/list";
-		$http.post(url, $scope.search).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				$scope.listData= data.Data;
-			}
-		});	
-	};
-
-
-	var modalInstance;
-	$scope.add = function() {
-        modalInstance = $modal.open({
-			backdrop: false,
-            templateUrl: "/static/page/modal/my_add.html?"+version,
-            controller: "MyEditCtrl",
-            resolve: {
-            	curr_data: function () {
-					 return {"Op":"add", "Data":{"Sort":100}};
-                }
-            }
-        });		
-	};
-
-	
-	$scope.edit = function(id) {
-		
-		var url = appCfg.AppPrefix + "/my/edit/" + id;
-		$http.get(url).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				 modalInstance = $modal.open({
-					backdrop: false,
-		            templateUrl: "/static/page/modal/base.html",
-		            controller: "MyEditCtrl",
-		            resolve: {
-		            	curr_data: function () {
-		                    return {"Op":"edit", "Data":data.Data};
-		                }
-		            }
-		        }), modalInstance.result.then(function (data) {
-		        	$scope.getList();
-		        });
-			}
-		});
-       
-	};
-	
-	$scope.play = function(key) {
-
-		var url = appCfg.AppPrefix + "/my/play/" + key;
-		$http.get(url).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				 modalInstance = $modal.open({
-					backdrop: false,
-		            templateUrl:"/static/page/modal/files_play.html?"+version,
-		            controller: "MyEditCtrl",
-		            resolve: {
-		            	curr_data: function () {
-		                    return {"Op":"play", "Data":data.Data};
-		                }
-		            }
-		      
-		        });
-			}
-		});
-
-	};
-
-	$scope.download = function(key) {
-
-		var url = appCfg.AppPrefix + "/my/download/" + key;
-		$http.get(url).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				window.location.href = data.Data.DownloadUrl;
-			}
-        })  
-       
-	};
-
-	$scope.activation = function(key) {
-
-		var url = appCfg.AppPrefix + "/my/activation/" + key;
-		$http.get(url).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				alert("激活成功");
-			}
-        })  
-       
-	};
-
-
-	$scope.del = function(item) {
-		EzConfirm.create({heading: '文件删除', text: '确定删除-“'+item.Name+'“吗？'}).then(function() {
-        	var post = angular.copy(item);  
-			var url = appCfg.AppPrefix + "/my/del";
-			$http.post(url, post).success(function(data, status, headers, config) {
-				if($filter("CheckError")(data)){
-					$scope.getList();
-				}
-			});		  	
-		});
-	};
-	
-
-	$scope.getList();
-}]);
-;
-
-app.controller("QqEditCtrl", ["$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", function ($scope, $http, $filter, $modalInstance, curr_data, appCfg) {
-	
-	
-    $scope.cancel = function () {
-    	$modalInstance.dismiss("cancel");
-    };   
-	
-    $scope.reset = function() {
-    	$scope.editData = angular.copy($scope.oldData);
-    };
-    
-    $scope.change = function(attr) {
-    	if (attr.length==0) {
-    		for (var attr in $scope.editData) {
-    			if (!$scope.oldData.hasOwnProperty(attr)) {
-    				return true;
-    			}
-    			if ($scope.oldData[attr] != $scope.editData[attr]) {
-            		return true;
-            	}
-    		}
-        	return false;    		
-    	} else {
-			if (!$scope.oldData.hasOwnProperty(attr)) {
-				return true;
-			}
-    		if ($scope.oldData[attr] != $scope.editData[attr]) {
-        		return true;
-        	}
-        	return false;
-    	}
-    	return false;
-    };
-    
-    $scope.save = function() {
-
-		$http.post($scope.postUrl, $scope.editData).success(function(data, status, headers, config) {
-			if($filter("CheckError")(data)){
-				$modalInstance.close(data);
-			}
-		});
-
-    };
-	/***********************数据定义*****************************/
-	$scope.attrDef = [
-		{"Key":"Qq", "Title":"QQ账号", "InputType":"text", "Required":"true"},
-		{"Key":"Password", "Title":"QQ密码", "InputType":"text", "Required":"true"},
-		{"Key":"Cookie", "Title":"Cookie", "InputType":"textarea", "Required":"true"},
-	];	
-	
-	/***********************初始化*****************************/
-	$scope.title = "添加QQ小号";
-	$scope.op =  angular.copy(curr_data.Op);
-	$scope.oldData = angular.copy(curr_data.Data);
-	$scope.editData = angular.copy($scope.oldData);
-    $scope.postUrl = appCfg.AppPrefix +"/qq/add";
-
-	if (curr_data.Op=='edit'){
-		$scope.title= "编辑QQ小号";
-		$scope.postUrl = appCfg.AppPrefix +"/qq/edit";
-	}
-
-
-
-}])
-;
-app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "configService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, configService) {
+app.controller("FilesListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "configService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, configService) {
 
 	$scope.config = configService.data;
 
@@ -636,7 +275,7 @@ app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm
 
 
 	$scope.getList = function() {
-		var url = appCfg.AppPrefix + "/qq/list";
+		var url = appCfg.AppPrefix + "/files/list";
 		$http.post(url, $scope.search).success(function(data, status, headers, config) {
 			if($filter("CheckError")(data)){
 				$scope.listData= data.Data;
@@ -650,9 +289,10 @@ app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm
 	$scope.add = function() {
 		
         modalInstance = $modal.open({
+			size: "lg",
 			backdrop: false,
             templateUrl: "/static/page/modal/base.html",
-            controller: "QqEditCtrl",
+            controller: "FilesEditCtrl",
             resolve: {
             	curr_data: function () {
                     return {"Op":"add", "Data":{"Sort":100}};
@@ -665,13 +305,13 @@ app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm
 	
 	$scope.edit = function(id) {
 		
-		var url = appCfg.AppPrefix + "/qq/edit/" + id;
+		var url = appCfg.AppPrefix + "/domain/edit/" + id;
 		$http.get(url).success(function(data, status, headers, config) {
 			if($filter("CheckError")(data)){
 				 modalInstance = $modal.open({
 					backdrop: false,
 		            templateUrl: "/static/page/modal/base.html",
-		            controller: "QqEditCtrl",
+		            controller: "DomainEditCtrl",
 		            resolve: {
 		            	curr_data: function () {
 		                    return {"Op":"edit", "Data":data.Data};
@@ -687,12 +327,13 @@ app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm
 	     
 
 	$scope.del = function(item) {
-		EzConfirm.create({heading: 'QQ小号删除', text: '确定删除“'+item.Qq+'“吗？'}).then(function() {
+		EzConfirm.create({heading: '域名删除', text: '确定删除域名“'+item.Name+'“吗？'}).then(function() {
         	var post = angular.copy(item);  
-			var url = appCfg.AppPrefix + "/qq/del";
+			var url = appCfg.AppPrefix + "/domain/del";
 			$http.post(url, post).success(function(data, status, headers, config) {
 				if($filter("CheckError")(data)){
 					$scope.getList();
+					storeService.getList(); 
 				}
 			});		  	
 		});

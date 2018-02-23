@@ -5,11 +5,12 @@ import (
 	"Traffic/controllers"
 	"Traffic/models"
 	"fmt"
-	"github.com/astaxie/beego"
 	"tsEngine/tsCrypto"
 	"tsEngine/tsDb"
 	"tsEngine/tsString"
 	"tsEngine/tsTime"
+
+	"github.com/astaxie/beego"
 )
 
 type LoginController struct {
@@ -52,7 +53,7 @@ func (this *LoginController) Login() {
 		}
 		//非开发者时候记录登录时间和IP
 		oAdmin.LoginTime = tsTime.CurrSe()
-		oAdmin.LoginIp = this.Ctx.Request.Header.Get("X-Forwarded-For")
+		oAdmin.LoginIp = this.Ctx.Request.RemoteAddr
 		//更新用户登录时间不是关键数据不需要判断错误
 		db.DbUpdate(&oAdmin, "LoginTime", "LoginIp")
 	}

@@ -246,7 +246,7 @@ app.controller("AdminEditCtrl", ["$scope", "$http", "$modalInstance", "$filter",
             {"Key":"Username", "Title":"登录账号", "InputType":"text", "Required":"true"},
 			{"Key":"Password", "Title":"密　　码", "InputType":"password", "Required":"true"},
 			{"Key":"ConfirmPassword", "Title":"确认密码", "InputType":"password", "Required":"true"},
-            {"Key":"Status", "Title":"状　　态", "InputType":"radio", "Value":[[1,"正常"],[2,"封杀"]], "Required":"true"},
+            {"Key":"Status", "Title":"状　　态", "InputType":"radio", "Value":[[1,"正常"],[2,"禁用"]], "Required":"true"},
 			{"Key":"Role", "Title":"角　　色", "InputType":"select-multiple", "Required":"false","Value":$scope.roles},
             {"Key":"Photo", "Title":"头　　像", "InputType":"upload-img", "Value":{"Width":136,"Height":136,"Force":1,"Quality":0.7}},
             
@@ -260,7 +260,6 @@ app.controller("AdminEditCtrl", ["$scope", "$http", "$modalInstance", "$filter",
             {"Key":"Address", "Title":"现 住 址", "InputType":"text", "Required":"false"},
             {"Key":"Note", "Title":"备　　注", "InputType":"textarea", "Required":"false"},
 
- 			{"Key":"Share", "Title":"是否分享", "InputType":"radio", "Value":[[1,"是"],[2,"否"]]},
 
 	];	
 	
@@ -280,7 +279,7 @@ app.controller("AdminEditCtrl", ["$scope", "$http", "$modalInstance", "$filter",
 	};
     
 	/***********************初始化*****************************/	
-	$scope.title= "添加新会员";
+	$scope.title= "添加新管理员";
 	$scope.postUrl = appCfg.AdminPrefix +"/admin/add";
 
 	$scope.op = curr_data.Op;
@@ -308,7 +307,7 @@ app.controller("AdminEditCtrl", ["$scope", "$http", "$modalInstance", "$filter",
     
 
 	if (curr_data.Op=='edit'){
-		$scope.title= "编辑会员信息";
+		$scope.title= "编辑管理员信息";
         $scope.attrDef[1].Required = "false";
         $scope.attrDef[2].Required = "false";
 		$scope.postUrl = appCfg.AdminPrefix +"/admin/edit";

@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/astaxie/beego/orm"
 	"tsEngine/tsPagination"
+
+	"github.com/astaxie/beego/orm"
 )
 
 //管理员表模型
@@ -22,14 +23,9 @@ type Admin struct {
 	LoginIp    string //登陆IP
 	LoginTime  uint64 //登陆时间
 	Status     int64  // 1:启用 2：停用
+	Note       string //备注
 	CreateTime uint64 //创建时间
 	UpdateTime uint64 //更新时间
-	Note       string //备注
-	DeviceId   string //设备Id
-	EndTime    uint64 //到期时间
-	Token      string //Token
-	Share      int64  //是否分享 1： 分享2：不分享
-
 }
 
 func init() {

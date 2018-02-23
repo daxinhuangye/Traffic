@@ -66,10 +66,10 @@
 									
 									<th>域名</th>
 									<th>排序</th>
+									<th>状态</th>
 									<th>备注</th>
 									<th width="85"><div>操作</div></th>
 
-				                    
 				                </tr>
 			                </thead>
 			                <tbody>
@@ -77,6 +77,7 @@
 									
 									<td><span>{{item.Domain}}</span></td>
 									<td><span>{{item.Sort}}</span></td>
+									<td><span>{{item.State}}</span></td>
 									<td><p>{{item.Note}}</p></td>
 									<td>
 										<button ng-if="checkPermission('domain','edit')" type="button" class="btn btn-default btn-sm" ng-click="edit(item.Id)" title="编辑" tabindex="0"><i class="fa fa-pencil"></i></button>
